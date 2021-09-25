@@ -1,5 +1,7 @@
 import { Component } from "react";
+import TodoCounter from "./TodoCounter";
 import TodoItem from "./TodoItem";
+import TodoSearchBox from "./TodoSearchBox";
 
 class TodoList extends Component {
   constructor() {
@@ -17,14 +19,19 @@ class TodoList extends Component {
       done: false,
       id: this.state.items.length,
     };
-    let newList = Array.from(this.state.items);
+
+    if (!item.text || !item.text.trim()) return;
+
+    let newList = this.state.items.map((item) => ({ ...item }));
     newList.push(item);
     this.setState({ items: newList }, this.filterList);
   }
 
   filterList() {
     const filteredList = this.state.items.filter(
-      (i) => this.state.filter === "" || i.text.toUpperCase().includes(this.state.filter.toUpperCase())
+      (i) =>
+        this.state.filter === "" ||
+        i.text.toUpperCase().includes(this.state.filter.toUpperCase())
     );
     this.setState({ filteredItems: filteredList });
   }
@@ -48,13 +55,18 @@ class TodoList extends Component {
     return (
       <div>
         <button onClick={this.addItem.bind(this)}>Agregar</button>
-        <p>Cantidad total de tareas: {this.state.items.length}</p>
-        <p>
-          Tareas sin hacer: {this.state.items.filter((i) => !i.done).length}
-        </p>
-        <div>
-          <label>Buscar:</label>
-          <input onKeyUp={this.onKeyUpSearch.bind(this)} />
+        <div className='container'>
+          <div className='row'>
+            <TodoCounter
+              message='Total tareas'
+              number={this.state.items.length}
+            />
+            <TodoCounter
+              message='Tareas sin hacer'
+              number={this.state.items.filter((i) => !i.done).length}
+            />
+            <TodoSearchBox onKeyUp={this.onKeyUpSearch.bind(this)} />
+          </div>
         </div>
         <ul>
           {this.state.filteredItems.map((i) => {
